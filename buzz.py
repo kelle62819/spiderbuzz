@@ -5,7 +5,9 @@ def deviceInit():
     "deviceInit establishes connections to the Buzz! controllers"
     devices = []
     for d in hid.enumerate(0x054c, 0x1000):
+        print d
         dev = hid.device(0x054c, 0x1000, d["path"])
+        dev.open_path(d["path"])
         dev.set_nonblocking(True)
         for i in range(0,10):
             dev.read(5)
@@ -14,9 +16,25 @@ def deviceInit():
 
         for x in range(0,4):
                 lights.append(0x0)
-    
-    return devices
+    for d in hid.enumerate(0x054c, 0x0002):
+        print d
+        dev = hid.device(0x054c, 0x0002, d["path"])
+        dev.open_path(d["path"])
+        dev.set_nonblocking(True)
+        for i in range(0,10):
+            dev.read(5)
+        devices.append(dev)
 
+
+        for x in range(0,4):
+                lights.append(0x0)    
+    return devices
+def clearPresses(devices):
+    for dev in devices:
+        data = dev.read(5)
+        while len(data) > 2:
+            data = dev.read(5)
+                
 def getPress(devices):
     if debug:
         devcnt = 0;
